@@ -2,7 +2,7 @@
 Product Routes
 
 
-/api/products
+# /api/products
 
 get - no params
 
@@ -25,7 +25,7 @@ put = params id - body {
 }
 
 
-/api/categories
+# /api/categories
 
 get - no params - query {
     populate: boolean
