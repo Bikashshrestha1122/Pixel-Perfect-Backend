@@ -6,7 +6,7 @@ const categoryRouter = require('./routes/category.route');
 const cors = require('cors');
 const port = process.env.PORT || 3000;
 
-dotenv.config();
+dotenv.config({quiet: true});
 
 const app = express();
 // app.use(cors());
