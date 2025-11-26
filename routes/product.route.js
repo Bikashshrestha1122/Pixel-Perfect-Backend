@@ -27,9 +27,8 @@ Router.get('/', async (req, res) => {
             .limit(limit);
 
         // Sort for dashboard mode
-        if (dashboard === 'true') {
             query = query.sort({ createdAt: -1 });  // newest first
-        }
+
 
         // Conditional populate
         if (populate === 'true') {
