@@ -22,18 +22,25 @@ function uploadBufferToCloudinary(buffer, folder) {
 // Create a new product
 const postProduct = async (req, res) => {
     try {
-        const { name, description, price, category, inStock } = req.body;
+        let { name, description, price, category, inStock } = req.body;
 
         if (!name || price === undefined) {
             return res.status(400).json({ error: 'Required fields: name and price' });
         }
 
+        if (typeof inStock === "string") {
+            inStock = inStock.trim().toLowerCase() === "yes";
+        } else if (typeof inStock === "boolean") {
+            inStock = inStock;
+        } else {
+            inStock = false; // default
+        }
         const productPayload = {
             name:name.trim(),
             description: description || '',
             price: Number(price),
             category: category || undefined, // Mongoose will cast to ObjectId if needed
-            inStock: inStock !== undefined ? Boolean(inStock) : undefined,
+            inStock: inStock,
             image: { url: '', public_id: '' },
             otherImages: [],
         };
