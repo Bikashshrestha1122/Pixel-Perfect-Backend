@@ -20,7 +20,7 @@ app.use(cors({
   credentials: true
 }))
 
-console.log(process.env.MONGO_URI);
+
 
 connectDB();
 app.use(express.json());
