@@ -7,12 +7,14 @@ const Category = require('../models/category.model'); // adjust path/name if you
 Router.get("/search", async (req, res) => {
     console.log("Search query:", req.query);
     try {
-        const { query } = req.query;
+        let { query } = req.query;
         console.log(query);
-
+        query = query?.toLowerCase();
 
         // If no search text, return empty array
         if (!query) {
+            console.log("Hello 123");
+            
             return res.json([]);
         }
 
@@ -34,6 +36,27 @@ Router.post('/', postCategory);
 Router.get('/', getCategories);
 
 Router.get('/:id', getCategoryById);
+
+Router.delete('/:name', async (req, res) => {
+    try {
+        console.log(req.params.name);
+        let name = req.params.name.toLowerCase();
+        const category = await Category.findOne({name});
+        if (!category) {
+            return res.status(404).json({ message: "Category not found" });
+        }
+        
+        if (category.products && category.products.length > 0) {
+            return res.status(400).json({ message: "Cannot delete category with products" });
+        }
+
+        await Category.findOneAndDelete({name});
+        res.status(200).json({ message: "Category deleted successfully" });
+    } catch (error) {
+        console.error("Error deleting category:", error);
+        res.status(500).json({ message: "Server error" });
+    }
+});
 
 
 module.exports = Router;

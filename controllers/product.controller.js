@@ -99,9 +99,10 @@ const getProductBYId = async (req, res) => {
     }
 }
 
+const mongoose = require('mongoose');
+
 const updateProduct = async (req, res) => {
     try {
-        // Only allow specific updatable fields and sanitize/validate them
         const allowedFields = ['name', 'description', 'price', 'category', 'inStock'];
         const updateData = {};
 
@@ -134,16 +135,45 @@ const updateProduct = async (req, res) => {
             }
         }
 
-        // Find and update with validators turned on
-        const product = await Product.findByIdAndUpdate(req.params.id, updateData, { new: true, runValidators: true });
-        if (!product) {
+        // Fetch existing product
+        const existingProduct = await Product.findById(req.params.id);
+        if (!existingProduct) {
             return res.status(404).json({ error: 'Product not found' });
         }
-        res.status(200).json(product);
+
+        const oldCategoryId = existingProduct.category?.toString();
+        const newCategoryId = updateData.category?.toString();
+
+        // Update product
+        const updatedProduct = await Product.findByIdAndUpdate(
+            req.params.id,
+            updateData,
+            { new: true, runValidators: true }
+        );
+
+        // Sync categories
+        if (newCategoryId && newCategoryId !== oldCategoryId) {
+
+            if (oldCategoryId) {
+                await Category.findByIdAndUpdate(
+                    oldCategoryId,
+                    { $pull: { products: updatedProduct._id } }
+                );
+            }
+
+            await Category.findByIdAndUpdate(
+                newCategoryId,
+                { $addToSet: { products: updatedProduct._id } }
+            );
+        }
+
+        res.status(200).json(updatedProduct);
+
     } catch (error) {
         res.status(400).json({ error: error.message });
     }
-}
+};
+
 
 
 const deleteProduct = async (req, res) => {

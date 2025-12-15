@@ -1,9 +1,11 @@
 const Category = require('../models/category.model');
+const { listenerCount } = require('../models/product.model');
 
 const postCategory = async (req, res) => {
     try {
-        const { name, description } = req.body;
-
+        let { name, description } = req.body;
+        name = name.toLowerCase();
+        console.log(name);
         if (!name) {
             return res.status(400).json({ error: 'Category name is required' });
         }
@@ -18,7 +20,7 @@ const postCategory = async (req, res) => {
         await category.save();
         res.status(201).json(category);
     } catch (error) {
-        res.status(400).json({ error: error.message });
+        res.status(500).json({ error: error.message });
     }
 }
 

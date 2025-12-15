@@ -29,6 +29,7 @@ app.use(cookieParser());
 
 
 
+
 app.use('/api/auth', require('./routes/auth.route'));
 app.use('/api/products', productRouter);
 app.use('/api/categories', categoryRouter);
