@@ -6,7 +6,6 @@ const postCategory = async (req, res) => {
     try {``
         let { name, description } = req.body;
         name = name.toLowerCase();
-        console.log(name);
         if (!name) {
             return res.status(400).json({ error: 'Category name is required' });
         }

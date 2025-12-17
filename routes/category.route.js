@@ -5,15 +5,12 @@ const { postCategory, getCategories, getCategoryById } = require('../controllers
 const Category = require('../models/category.model'); // adjust path/name if your model differs
 
 Router.get("/search", async (req, res) => {
-    console.log("Search query:", req.query);
     try {
         let { query } = req.query;
-        console.log(query);
         query = query?.toLowerCase();
 
         // If no search text, return empty array
         if (!query) {
-            console.log("Hello 123");
             
             return res.json([]);
         }
@@ -39,7 +36,6 @@ Router.get('/:id', getCategoryById);
 
 Router.delete('/:name', async (req, res) => {
     try {
-        console.log(req.params.name);
         let name = req.params.name.toLowerCase();
         const category = await Category.findOne({name});
         if (!category) {
