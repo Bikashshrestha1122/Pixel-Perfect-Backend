@@ -26,9 +26,28 @@ const postCategory = async (req, res) => {
 
 const getCategories = async (req, res) => {
     try {
-        let query = req.query.populate === 'true';
-        const categories = query ? await Category.find().populate('products') : await Category.find();
-        res.status(200).json(categories);
+        const populate = req.query.populate === 'true';
+        const page = Math.max(parseInt(req.params.page, 10) || 1, 1);
+        const limit = Math.max(parseInt(req.params.limit, 10) || 10, 1);
+        const skip = (page - 1) * limit;
+
+        const total = await Category.countDocuments();
+        const totalPages = Math.ceil(total / limit);
+
+        const categories = populate
+            ? await Category.find().populate('products').skip(skip).limit(limit)
+            : await Category.find().skip(skip).limit(limit);
+
+            console.log(categories)
+        res.status(200).json({
+            data: categories,
+            pagination: {
+                total,
+                totalPages,
+                page,
+                limit
+            }
+        });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
