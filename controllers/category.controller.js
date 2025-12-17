@@ -3,7 +3,7 @@ const { listenerCount } = require('../models/product.model');
 const mongoose = require('mongoose');
 
 const postCategory = async (req, res) => {
-    try {
+    try {``
         let { name, description } = req.body;
         name = name.toLowerCase();
         console.log(name);

@@ -28,10 +28,10 @@ const postProduct = async (req, res) => {
             return res.status(400).json({ error: 'Required fields: name and price' });
         }
 
-        
-        
+
+
         const productPayload = {
-            name:name.trim(),
+            name: name.trim(),
             description: description || '',
             price: Number(price),
             category: category || undefined, // Mongoose will cast to ObjectId if needed
@@ -89,6 +89,11 @@ const getAllProducts = async (req, res) => {
 const getProductBYId = async (req, res) => {
     try {
         let query = req.query.populate === 'true';
+
+        if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+            return res.status(400).json({ error: 'Invalid Product ID' });
+        }
+
         const product = query ? await Product.findById(req.params.id).populate('category') : await Product.findById(req.params.id);
         if (!product) {
             return res.status(404).json({ error: 'Product not found' });
@@ -188,16 +193,16 @@ const deleteProduct = async (req, res) => {
         if (product.image && product.image.public_id) publicIds.push(product.image.public_id);
         if (Array.isArray(product.otherImages)) {
             product.otherImages.forEach(img => {
-            if (img && img.public_id) publicIds.push(img.public_id);
+                if (img && img.public_id) publicIds.push(img.public_id);
             });
         }
 
         // Delete images from Cloudinary (use Promise.allSettled so one failure won't block the rest)
         if (publicIds.length) {
             await Promise.allSettled(publicIds.map(id =>
-            new Promise((resolve) => {
-                cloudinary.uploader.destroy(id, (err, result) => resolve({ id, err, result }));
-            })
+                new Promise((resolve) => {
+                    cloudinary.uploader.destroy(id, (err, result) => resolve({ id, err, result }));
+                })
             ));
         }
 
