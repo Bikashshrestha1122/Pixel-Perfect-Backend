@@ -1,5 +1,6 @@
 const Category = require('../models/category.model');
 const { listenerCount } = require('../models/product.model');
+const mongoose = require('mongoose');
 
 const postCategory = async (req, res) => {
     try {
@@ -39,6 +40,10 @@ const getCategoryById = async (req, res) => {
         const populate = req.query.populate === 'true';
         const page = Math.max(parseInt(req.query.page, 10) || 1, 1);
         const limit = Math.max(parseInt(req.query.limit, 10) || 10, 1);
+
+        if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+            return res.status(400).json({ error: 'Invalid category ID' });
+        }
 
         // If no population requested, just return the category
         if (!populate) {
