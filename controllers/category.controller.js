@@ -38,7 +38,6 @@ const getCategories = async (req, res) => {
             ? await Category.find().populate('products').skip(skip).limit(limit)
             : await Category.find().skip(skip).limit(limit);
 
-            console.log(categories)
         res.status(200).json({
             data: categories,
             pagination: {
