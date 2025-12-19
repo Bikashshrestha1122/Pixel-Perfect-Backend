@@ -6,7 +6,7 @@ const LoginController = (req, res) => {
         const { username, password } = req.body;
         if (username === process.env.ADMIN_USERNAME && password === process.env.ADMIN_PASSWORD) {
             const token = jwt.sign({ username }, process.env.JWT_SECRET, { expiresIn: '1h' });
-            res.cookie('token', token, { httpOnly: true, sameSite: 'None', secure: false });
+            res.cookie('token', token, { httpOnly: true, sameSite: 'None', secure: true });
             res.status(200).json({ message: 'Login successful' });
 
         } else {
