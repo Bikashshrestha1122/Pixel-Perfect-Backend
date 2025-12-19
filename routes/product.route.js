@@ -3,12 +3,13 @@ const Router = express.Router();
 const Product = require('../models/product.model');
 let { uploadProductImage } = require('../config/multer');
 const { postProduct, getProductBYId, updateProduct, deleteProduct } = require('../controllers/product.controller');
+const { authenticateAdmin } = require('../middlewares/auth.middleware');
 
 
 
 
 // Create a new product
-Router.post('/', uploadProductImage, postProduct);
+Router.post('/', authenticateAdmin, uploadProductImage, postProduct);
 
 
 // GET /products?page=1&limit=10
@@ -27,7 +28,7 @@ Router.get('/', async (req, res) => {
             .limit(limit);
 
         // Sort for dashboard mode
-            query = query.sort({ createdAt: -1 });  // newest first
+        query = query.sort({ createdAt: -1 });  // newest first
 
 
         // Conditional populate
@@ -81,10 +82,10 @@ Router.get('/recent', async (req, res) => {
 Router.get('/:id', getProductBYId);
 
 // Update a product by ID
-Router.put('/:id', updateProduct);
+Router.put('/:id', authenticateAdmin, updateProduct);
 
 // Delete a product by ID
-Router.delete('/:id', deleteProduct);
+Router.delete('/:id', authenticateAdmin, deleteProduct);
 
 
 module.exports = Router;

@@ -3,6 +3,7 @@ const Router = express.Router();
 
 const { postCategory, getCategories, getCategoryById } = require('../controllers/category.controller');
 const Category = require('../models/category.model'); // adjust path/name if your model differs
+const { authenticateAdmin } = require('../middlewares/auth.middleware');
 
 Router.get("/search", async (req, res) => {
     try {
@@ -11,7 +12,7 @@ Router.get("/search", async (req, res) => {
 
         // If no search text, return empty array
         if (!query) {
-            
+
             return res.json([]);
         }
 
@@ -28,25 +29,25 @@ Router.get("/search", async (req, res) => {
 
 
 
-Router.post('/', postCategory);
+Router.post('/', authenticateAdmin, postCategory);
 
 Router.get('/', getCategories);
 
 Router.get('/:id', getCategoryById);
 
-Router.delete('/:name', async (req, res) => {
+Router.delete('/:name', authenticateAdmin, async (req, res) => {
     try {
         let name = req.params.name.toLowerCase();
-        const category = await Category.findOne({name});
+        const category = await Category.findOne({ name });
         if (!category) {
             return res.status(404).json({ message: "Category not found" });
         }
-        
+
         if (category.products && category.products.length > 0) {
             return res.status(400).json({ message: "Cannot delete category with products" });
         }
 
-        await Category.findOneAndDelete({name});
+        await Category.findOneAndDelete({ name });
         res.status(200).json({ message: "Category deleted successfully" });
     } catch (error) {
         console.error("Error deleting category:", error);

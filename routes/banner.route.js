@@ -7,11 +7,11 @@ let Router = express.Router()
 
 
 
-Router.post("/", upload.single("image"), authenticateAdmin, postBanner)
+Router.post("/", authenticateAdmin, upload.single("image"), postBanner)
 
 Router.get("/", getBanner)
 
-Router.get("/:id",getOneBanner)
+Router.get("/:id", getOneBanner)
 
 Router.put("/:id", authenticateAdmin, updateBanner)
 
