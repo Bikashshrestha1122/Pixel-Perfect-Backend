@@ -6,6 +6,8 @@ const morgan = require('morgan');
 
 const productRouter = require('./routes/product.route');
 const categoryRouter = require('./routes/category.route');
+const bannerRouter = require("./routes/banner.route")
+
 const cors = require('cors');
 const port = process.env.PORT || 3000;
 
@@ -33,6 +35,7 @@ app.use(cookieParser());
 app.use('/api/auth', require('./routes/auth.route'));
 app.use('/api/products', productRouter);
 app.use('/api/categories', categoryRouter);
+app.use('/api/banners', bannerRouter)
 
 app.listen(port, () => {
   console.log(`Server is running at http://localhost:${port}`);
