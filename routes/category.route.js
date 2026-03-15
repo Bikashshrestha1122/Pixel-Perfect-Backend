@@ -35,10 +35,10 @@ Router.get('/', getCategories);
 
 Router.get('/:id', getCategoryById);
 
-Router.delete('/:name', authenticateAdmin, async (req, res) => {
+Router.delete('/:id', authenticateAdmin, async (req, res) => {
     try {
-        let name = req.params.name.toLowerCase();
-        const category = await Category.findOne({ name });
+        const category = await Category.findById(req.params.id);
+
         if (!category) {
             return res.status(404).json({ message: "Category not found" });
         }
@@ -47,8 +47,10 @@ Router.delete('/:name', authenticateAdmin, async (req, res) => {
             return res.status(400).json({ message: "Cannot delete category with products" });
         }
 
-        await Category.findOneAndDelete({ name });
+        await Category.findByIdAndDelete(req.params.id);
+
         res.status(200).json({ message: "Category deleted successfully" });
+
     } catch (error) {
         console.error("Error deleting category:", error);
         res.status(500).json({ message: "Server error" });
