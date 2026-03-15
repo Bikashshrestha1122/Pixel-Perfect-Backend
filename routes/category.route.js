@@ -35,33 +35,24 @@ Router.get('/', getCategories);
 
 Router.get('/:id', getCategoryById);
 
-const handleDelete = async () => {
-
-    const confirmDelete = window.confirm(
-        `Are you sure you want to delete the category "${category?.name}"?`
-    );
-    if (!confirmDelete) return;
-
+Router.delete('/:name', authenticateAdmin, async (req, res) => {
     try {
-        await axios.delete(
-            `${import.meta.env.VITE_API_URL}/categories/${id}`,
-            {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem("token")}`
-                }
-            }
-        );
+        let name = req.params.name.toLowerCase();
+        const category = await Category.findOne({ name });
+        if (!category) {
+            return res.status(404).json({ message: "Category not found" });
+        }
 
-        alert("Category deleted successfully!");
-        navigate("/admin/categories");
+        if (category.products && category.products.length > 0) {
+            return res.status(400).json({ message: "Cannot delete category with products" });
+        }
 
-    } catch (err) {
-        console.error("Delete error:", err);
-        setMessage(
-            `Error Deleting Category: ${
-                err.response?.data?.message || "Unknown error"
-            }`
-        );
+        await Category.findOneAndDelete({ name });
+        res.status(200).json({ message: "Category deleted successfully" });
+    } catch (error) {
+        console.error("Error deleting category:", error);
+        res.status(500).json({ message: "Server error" });
     }
+
 };
 module.exports = Router;
