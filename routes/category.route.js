@@ -1,39 +1,11 @@
-const express = require('express');
+const express = require("express");
 const Router = express.Router();
+const Category = require("../models/category.model");
+const { authenticateAdmin } = require("../middlewares/auth.middleware");
 
-const { postCategory, getCategories, getCategoryById } = require('../controllers/category.controller');
-const Category = require('../models/category.model'); // adjust path/name if your model differs
-const { authenticateAdmin } = require('../middlewares/auth.middleware');
+// Create category, get categories, get by ID...
+// (keep your existing routes for GET and POST)
 
-Router.get("/search", async (req, res) => {
-    try {
-        let { query } = req.query;
-        query = query?.toLowerCase();
-
-        // If no search text, return empty array
-        if (!query) {
-
-            return res.json([]);
-        }
-
-        const categories = await Category.find({
-            name: { $regex: query, $options: "i" }, // i = case-insensitive
-        });
-
-        res.json(categories);
-    } catch (error) {
-        console.error("Search route error:", error);
-        res.status(500).json({ message: "Server error" });
-    }
-});
-
-
-
-Router.post('/', authenticateAdmin, postCategory);
-
-Router.get('/', getCategories);
-
-Router.get('/:id', getCategoryById);
 
 // DELETE CATEGORY BY ID
 Router.delete("/:id", authenticateAdmin, async (req, res) => {
