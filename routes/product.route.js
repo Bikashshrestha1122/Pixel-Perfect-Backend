@@ -44,7 +44,7 @@ Router.get('/search', async (req, res) => {
                 { description: searchRegex },
             ]
         })
-        .select('name description price category image')   // only what the search box needs
+        .select('name description price category image.url')   // only what the search box needs
         .limit(5);
 
         if (populateCategory) {
