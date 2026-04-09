@@ -8,6 +8,71 @@ const { authenticateAdmin } = require('../middlewares/auth.middleware');
 
 
 
+
+Router.get('/recent', async (req, res) => {
+    try {
+        const populateCategory = req.query.populate === 'true';
+        let q = Product.find().sort({ createdAt: -1 }).limit(6);
+        if (populateCategory) q = q.populate({
+            path: 'category',
+            select: 'name description'
+        });
+        const products = await q.exec();
+
+        res.json({ count: products.length, products });
+    } catch (error) {
+        console.error('Recent products error:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+
+Router.get('/search', async (req, res) => {
+    try {
+        const { q, populate } = req.query;
+
+        if (!q || q.trim() === '') {
+            return res.status(400).json({ message: 'Search query is required' });
+        }
+
+        const searchRegex = new RegExp(q.trim(), 'i');
+        const populateCategory = populate === 'true';
+
+        let query = Product.find({
+            $or: [
+                { name: searchRegex },
+                { description: searchRegex },
+            ]
+        })
+        .select('name description price category')   // only what the search box needs
+        .limit(5);
+
+        if (populateCategory) {
+            query = query.populate({
+                path: 'category',
+                select: 'name description'
+            });
+        }
+
+        const products = await query.exec();
+        res.json({ count: products.length, products });
+
+    } catch (error) {
+        console.error('Product search error:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// Get a product by ID
+Router.get('/:id', getProductBYId);
+
+// Update a product by ID
+Router.put('/:id', authenticateAdmin, updateProduct);
+
+// Delete a product by ID
+Router.delete('/:id', authenticateAdmin, deleteProduct);
+
+
 // Create a new product
 Router.post('/', authenticateAdmin, uploadProductImage, postProduct);
 
@@ -59,33 +124,6 @@ Router.get('/', async (req, res) => {
 });
 
 
-
-Router.get('/recent', async (req, res) => {
-    try {
-        const populateCategory = req.query.populate === 'true';
-        let q = Product.find().sort({ createdAt: -1 }).limit(6);
-        if (populateCategory) q = q.populate({
-            path: 'category',
-            select: 'name description'
-        });
-        const products = await q.exec();
-
-        res.json({ count: products.length, products });
-    } catch (error) {
-        console.error('Recent products error:', error);
-        res.status(500).json({ message: 'Server error' });
-    }
-});
-
-
-// Get a product by ID
-Router.get('/:id', getProductBYId);
-
-// Update a product by ID
-Router.put('/:id', authenticateAdmin, updateProduct);
-
-// Delete a product by ID
-Router.delete('/:id', authenticateAdmin, deleteProduct);
 
 
 module.exports = Router;
