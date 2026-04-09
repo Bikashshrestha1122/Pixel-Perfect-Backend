@@ -16,7 +16,7 @@ Router.post('/', authenticateAdmin, uploadProductImage, postProduct);
 Router.get('/', async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
-        const limit = parseInt(req.query.limit) || 10;
+        const limit = parseInt(req.query.limit) || 28;
         const { category, populate, dashboard } = req.query;
 
         const skip = (page - 1) * limit;
