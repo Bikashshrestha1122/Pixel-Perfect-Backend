@@ -3,7 +3,8 @@ const { listenerCount } = require('../models/product.model');
 const mongoose = require('mongoose');
 
 const postCategory = async (req, res) => {
-    try {``
+    try {
+        ``
         let { name, description } = req.body;
         name = name.toLowerCase();
         if (!name) {
@@ -27,8 +28,8 @@ const postCategory = async (req, res) => {
 const getCategories = async (req, res) => {
     try {
         const populate = req.query.populate === 'true';
-        const page = Math.max(parseInt(req.params.page, 10) || 1, 1);
-        const limit = Math.max(parseInt(req.params.limit, 10) || 10, 1);
+        const page = Math.max(parseInt(req.query.page, 10) || 1, 1);
+        const limit = Math.max(parseInt(req.query.limit, 10) || 10, 1);
         const skip = (page - 1) * limit;
 
         const total = await Category.countDocuments();
